@@ -2,35 +2,62 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Simple Text Editor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Text Editor</title>
 
 <style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:white;
 }
 
-.toolbar {
-    background: #eeeeee;
-    padding: 10px;
-    border-bottom: 1px solid #cccccc;
+.toolbar{
+    background:#f5f5f5;
+    padding:10px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    border-bottom:1px solid #ccc;
+    position:sticky;
+    top:0;
 }
 
-button {
-    padding: 8px 12px;
-    margin-right: 5px;
-    cursor: pointer;
+button{
+    padding:8px 12px;
+    border:1px solid #ccc;
+    border-radius:5px;
+    cursor:pointer;
+    background:white;
 }
 
-#editor {
-    min-height: 500px;
-    padding: 15px;
-    outline: none;
-    font-size: 18px;
+button:hover{
+    background:#ececec;
 }
+
+#editor{
+    min-height:700px;
+    padding:20px;
+    outline:none;
+    font-size:18px;
+}
+
+#editor:empty:before{
+    content:attr(data-placeholder);
+    color:gray;
+}
+
+label{
+    font-size:14px;
+    font-weight:bold;
+}
+
 </style>
-
 </head>
+
 <body>
 
 <div class="toolbar">
@@ -47,33 +74,197 @@ button {
 <u>U</u>
 </button>
 
-<label>Text Color:</label>
+<label>Text</label>
 <input type="color" id="textColor">
 
-<label>Highlight:</label>
+<button onclick="setTextColor()">
+Apply
+</button>
+
+<label>Highlight</label>
 <input type="color" id="highlightColor">
 
-<button onclick="setTextColor()">Apply Color</button>
+<button onclick="setHighlightColor()">
+Apply
+</button>
 
-<button onclick="setHighlight()">Apply Highlight</button>
+<label>Page</label>
+<input type="color" id="pageColor">
+
+<button onclick="setPageColor()">
+Apply
+</button>
+
+<button onclick="saveFile()">
+💾 Save
+</button>
+
+<button onclick="document.getElementById('openFile').click()">
+📂 Open
+</button>
+
+<input
+type="file"
+id="openFile"
+style="display:none"
+onchange="openFile(event)"
+>
+
+<label>Auto Save</label>
+
+<input
+type="checkbox"
+id="autoSave"
+>
 
 </div>
 
-<div id="editor" contenteditable="true">
-Type your text here...
+<div
+id="editor"
+contenteditable="true"
+data-placeholder="Start typing...">
 </div>
 
 <script>
 
-function setTextColor() {
-    let color = document.getElementById("textColor").value;
-    document.execCommand("foreColor", false, color);
+const editor =
+document.getElementById("editor");
+
+const autoSave =
+document.getElementById("autoSave");
+
+window.onload = function(){
+
+    let savedText =
+    localStorage.getItem("editorData");
+
+    let savedPageColor =
+    localStorage.getItem("pageColor");
+
+    let autoSaveState =
+    localStorage.getItem("autoSave");
+
+    if(savedText){
+        editor.innerHTML = savedText;
+    }
+
+    if(savedPageColor){
+        document.body.style.backgroundColor =
+        savedPageColor;
+    }
+
+    if(autoSaveState === "true"){
+        autoSave.checked = true;
+    }
+};
+
+function setTextColor(){
+
+    let color =
+    document.getElementById("textColor").value;
+
+    document.execCommand(
+        "foreColor",
+        false,
+        color
+    );
 }
 
-function setHighlight() {
-    let color = document.getElementById("highlightColor").value;
-    document.execCommand("hiliteColor", false, color);
+function setHighlightColor(){
+
+    let color =
+    document.getElementById("highlightColor").value;
+
+    document.execCommand(
+        "hiliteColor",
+        false,
+        color
+    );
 }
+
+function setPageColor(){
+
+    let color =
+    document.getElementById("pageColor").value;
+
+    document.body.style.backgroundColor =
+    color;
+
+    localStorage.setItem(
+        "pageColor",
+        color
+    );
+}
+
+function saveFile(){
+
+    let text =
+    editor.innerHTML;
+
+    let blob =
+    new Blob(
+        [text],
+        {type:"text/html"}
+    );
+
+    let link =
+    document.createElement("a");
+
+    link.href =
+    URL.createObjectURL(blob);
+
+    link.download =
+    "MyText.html";
+
+    link.click();
+}
+
+function openFile(event){
+
+    let file =
+    event.target.files[0];
+
+    if(!file) return;
+
+    let reader =
+    new FileReader();
+
+    reader.onload =
+    function(e){
+
+        editor.innerHTML =
+        e.target.result;
+
+    };
+
+    reader.readAsText(file);
+}
+
+autoSave.addEventListener(
+"change",
+function(){
+
+    localStorage.setItem(
+        "autoSave",
+        this.checked
+    );
+
+});
+
+editor.addEventListener(
+"input",
+function(){
+
+    if(autoSave.checked){
+
+        localStorage.setItem(
+            "editorData",
+            editor.innerHTML
+        );
+
+    }
+
+});
 
 </script>
 
