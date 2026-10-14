@@ -4,23 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Text Editor</title>
+<title>Ultimate Text Editor</title>
 
 <style>
 
 body{
     margin:0;
-    font-family:Arial, sans-serif;
-    background:white;
+    font-family:Arial,sans-serif;
+    background:#ffffff;
 }
 
 .toolbar{
-    background:#f5f5f5;
+    background:#f0f0f0;
     padding:10px;
     display:flex;
     flex-wrap:wrap;
     gap:8px;
-    align-items:center;
     border-bottom:1px solid #ccc;
     position:sticky;
     top:0;
@@ -28,21 +27,27 @@ body{
 
 button{
     padding:8px 12px;
+    cursor:pointer;
     border:1px solid #ccc;
     border-radius:5px;
-    cursor:pointer;
-    background:white;
 }
 
 button:hover{
-    background:#ececec;
+    background:#eaeaea;
+}
+
+#settingsPanel{
+    display:none;
+    padding:15px;
+    background:#f9f9f9;
+    border-bottom:1px solid #ccc;
 }
 
 #editor{
     min-height:700px;
     padding:20px;
-    outline:none;
     font-size:18px;
+    outline:none;
 }
 
 #editor:empty:before{
@@ -50,9 +55,8 @@ button:hover{
     color:gray;
 }
 
-label{
-    font-size:14px;
-    font-weight:bold;
+.setting-group{
+    margin-bottom:12px;
 }
 
 </style>
@@ -74,25 +78,14 @@ label{
 <u>U</u>
 </button>
 
-<label>Text</label>
 <input type="color" id="textColor">
-
 <button onclick="setTextColor()">
-Apply
+Text Color
 </button>
 
-<label>Highlight</label>
 <input type="color" id="highlightColor">
-
 <button onclick="setHighlightColor()">
-Apply
-</button>
-
-<label>Page</label>
-<input type="color" id="pageColor">
-
-<button onclick="setPageColor()">
-Apply
+Highlight
 </button>
 
 <button onclick="saveFile()">
@@ -117,12 +110,56 @@ type="checkbox"
 id="autoSave"
 >
 
+<button onclick="toggleSettings()">
+⚙️ Settings
+</button>
+
 </div>
+
+
+<div id="settingsPanel">
+
+<h3>Settings</h3>
+
+<div class="setting-group">
+<label>Website Color</label>
+<input type="color" id="pageColor">
+<button onclick="changePageColor()">
+Apply
+</button>
+</div>
+
+<div class="setting-group">
+<label>Editor Width (%)</label>
+<input type="number" id="editorWidth" value="100">
+<button onclick="changeWidth()">
+Apply
+</button>
+</div>
+
+<div class="setting-group">
+<label>Editor Height (px)</label>
+<input type="number" id="editorHeight" value="700">
+<button onclick="changeHeight()">
+Apply
+</button>
+</div>
+
+<div class="setting-group">
+<label>Font Size (px)</label>
+<input type="number" id="fontSize" value="18">
+<button onclick="changeFontSize()">
+Apply
+</button>
+</div>
+
+</div>
+
 
 <div
 id="editor"
 contenteditable="true"
-data-placeholder="Start typing...">
+data-placeholder="Start typing here...">
 </div>
 
 <script>
@@ -133,138 +170,199 @@ document.getElementById("editor");
 const autoSave =
 document.getElementById("autoSave");
 
-window.onload = function(){
 
-    let savedText =
-    localStorage.getItem("editorData");
+window.onload=function(){
 
-    let savedPageColor =
-    localStorage.getItem("pageColor");
+let savedText =
+localStorage.getItem("editorText");
 
-    let autoSaveState =
-    localStorage.getItem("autoSave");
+let savedColor =
+localStorage.getItem("pageColor");
 
-    if(savedText){
-        editor.innerHTML = savedText;
-    }
+let savedAuto =
+localStorage.getItem("autoSave");
 
-    if(savedPageColor){
-        document.body.style.backgroundColor =
-        savedPageColor;
-    }
+if(savedText){
+editor.innerHTML=savedText;
+}
 
-    if(autoSaveState === "true"){
-        autoSave.checked = true;
-    }
+if(savedColor){
+document.body.style.backgroundColor=
+savedColor;
+}
+
+if(savedAuto==="true"){
+autoSave.checked=true;
+}
+
 };
+
 
 function setTextColor(){
 
-    let color =
-    document.getElementById("textColor").value;
+let color=
+document.getElementById("textColor").value;
 
-    document.execCommand(
-        "foreColor",
-        false,
-        color
-    );
+document.execCommand(
+"foreColor",
+false,
+color
+);
+
 }
+
 
 function setHighlightColor(){
 
-    let color =
-    document.getElementById("highlightColor").value;
+let color=
+document.getElementById("highlightColor").value;
 
-    document.execCommand(
-        "hiliteColor",
-        false,
-        color
-    );
+document.execCommand(
+"hiliteColor",
+false,
+color
+);
+
 }
 
-function setPageColor(){
-
-    let color =
-    document.getElementById("pageColor").value;
-
-    document.body.style.backgroundColor =
-    color;
-
-    localStorage.setItem(
-        "pageColor",
-        color
-    );
-}
 
 function saveFile(){
 
-    let text =
-    editor.innerHTML;
+let blob=
+new Blob(
+[editor.innerHTML],
+{type:"text/html"}
+);
 
-    let blob =
-    new Blob(
-        [text],
-        {type:"text/html"}
-    );
+let link=
+document.createElement("a");
 
-    let link =
-    document.createElement("a");
+link.href=
+URL.createObjectURL(blob);
 
-    link.href =
-    URL.createObjectURL(blob);
+link.download=
+"MyNotes.html";
 
-    link.download =
-    "MyText.html";
+link.click();
 
-    link.click();
 }
+
 
 function openFile(event){
 
-    let file =
-    event.target.files[0];
+let file=
+event.target.files[0];
 
-    if(!file) return;
+if(!file) return;
 
-    let reader =
-    new FileReader();
+let reader=
+new FileReader();
 
-    reader.onload =
-    function(e){
+reader.onload=function(e){
 
-        editor.innerHTML =
-        e.target.result;
+editor.innerHTML=
+e.target.result;
 
-    };
+};
 
-    reader.readAsText(file);
+reader.readAsText(file);
+
 }
+
 
 autoSave.addEventListener(
 "change",
 function(){
 
-    localStorage.setItem(
-        "autoSave",
-        this.checked
-    );
+localStorage.setItem(
+"autoSave",
+this.checked
+);
 
-});
+}
+);
+
 
 editor.addEventListener(
 "input",
 function(){
 
-    if(autoSave.checked){
+if(autoSave.checked){
 
-        localStorage.setItem(
-            "editorData",
-            editor.innerHTML
-        );
+localStorage.setItem(
+"editorText",
+editor.innerHTML
+);
 
-    }
+}
 
-});
+}
+);
+
+
+function toggleSettings(){
+
+let panel=
+document.getElementById(
+"settingsPanel"
+);
+
+if(panel.style.display==="block"){
+panel.style.display="none";
+}else{
+panel.style.display="block";
+}
+
+}
+
+
+function changePageColor(){
+
+let color=
+document.getElementById("pageColor").value;
+
+document.body.style.backgroundColor=
+color;
+
+localStorage.setItem(
+"pageColor",
+color
+);
+
+}
+
+
+function changeWidth(){
+
+let width=
+document.getElementById("editorWidth").value;
+
+editor.style.width=
+width+"%";
+
+}
+
+
+function changeHeight(){
+
+let height=
+document.getElementById("editorHeight").value;
+
+editor.style.minHeight=
+height+"px";
+
+}
+
+
+function changeFontSize(){
+
+let size=
+document.getElementById("fontSize").value;
+
+editor.style.fontSize=
+size+"px";
+
+}
 
 </script>
 
