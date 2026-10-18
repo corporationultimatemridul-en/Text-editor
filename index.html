@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ultimate Text Editor</title>
 
 <style>
+
 body{
     margin:0;
     font-family:Arial,sans-serif;
@@ -16,20 +17,22 @@ body{
     background:#333;
 }
 
-.tab{
+.tabs button{
+    background:none;
+    border:none;
     color:white;
-    padding:12px 20px;
+    padding:14px 20px;
     cursor:pointer;
 }
 
-.tab:hover{
+.tabs button:hover{
     background:#555;
 }
 
 .panel{
     display:none;
-    padding:10px;
     background:#f0f0f0;
+    padding:10px;
     border-bottom:1px solid #ccc;
 }
 
@@ -37,7 +40,7 @@ body{
     display:block;
 }
 
-button{
+.toolbtn{
     padding:8px 12px;
     margin:3px;
     cursor:pointer;
@@ -46,8 +49,8 @@ button{
 #editor{
     min-height:600px;
     padding:20px;
-    outline:none;
     font-size:18px;
+    outline:none;
 }
 
 #editor:empty:before{
@@ -60,103 +63,155 @@ button{
     padding:10px;
     border-top:1px solid #ccc;
 }
-</style>
 
+table{
+    border-collapse:collapse;
+}
+
+td{
+    border:1px solid black;
+    min-width:80px;
+    height:30px;
+    padding:4px;
+}
+
+</style>
 </head>
+
 <body>
 
 <div class="tabs">
-    <div class="tab" onclick="showTab('file')">📁 File</div>
-    <div class="tab" onclick="showTab('edit')">✏️ Edit</div>
-    <div class="tab" onclick="showTab('insert')">➕ Insert</div>
-    <div class="tab" onclick="showTab('settings')">⚙️ Settings</div>
+
+<button onclick="showTab('file')">
+📁 File
+</button>
+
+<button onclick="showTab('edit')">
+✏️ Edit
+</button>
+
+<button onclick="showTab('insert')">
+➕ Insert
+</button>
+
+<button onclick="showTab('settings')">
+⚙️ Settings
+</button>
+
 </div>
+
+<!-- FILE TAB -->
 
 <div id="file" class="panel active">
 
-    <button onclick="newPage()">📄 New</button>
+<button class="toolbtn" onclick="newPage()">
+📄 New Page
+</button>
 
-    <button onclick="document.getElementById('openFile').click()">
-        📂 Open
-    </button>
+<button class="toolbtn"
+onclick="document.getElementById('openFile').click()">
+📂 Open
+</button>
 
-    <button onclick="saveFile()">
-        💾 Save
-    </button>
+<button class="toolbtn"
+onclick="saveFile()">
+💾 Save
+</button>
 
-    <input
-    type="file"
-    id="openFile"
-    style="display:none"
-    onchange="openFile(event)">
+<input
+type="file"
+id="openFile"
+style="display:none"
+onchange="openFile(event)"
+>
 
 </div>
+
+<!-- EDIT TAB -->
 
 <div id="edit" class="panel">
 
-    <button onclick="document.execCommand('bold')">
-        🅱️ Bold
-    </button>
+<button class="toolbtn"
+onclick="document.execCommand('bold')">
+🅱️ Bold
+</button>
 
-    <button onclick="document.execCommand('italic')">
-        𝑰 Italic
-    </button>
+<button class="toolbtn"
+onclick="document.execCommand('italic')">
+𝑰 Italic
+</button>
 
-    <button onclick="document.execCommand('underline')">
-        U̲ Underline
-    </button>
+<button class="toolbtn"
+onclick="document.execCommand('underline')">
+U̲ Underline
+</button>
 
-    <input type="color" id="textColor">
-    <button onclick="setTextColor()">
-        🎨 Text Color
-    </button>
+<input type="color" id="textColor">
 
-    <input type="color" id="highlightColor">
-    <button onclick="setHighlight()">
-        🖍 Highlight
-    </button>
+<button class="toolbtn"
+onclick="setTextColor()">
+🎨 Text Color
+</button>
+
+<input type="color" id="highlightColor">
+
+<button class="toolbtn"
+onclick="setHighlightColor()">
+🖍 Highlight
+</button>
 
 </div>
+
+<!-- INSERT TAB -->
 
 <div id="insert" class="panel">
 
-    <button onclick="insertImage()">
-        🖼 Insert Image
-    </button>
+<button class="toolbtn"
+onclick="insertImage()">
+🖼 Insert Image
+</button>
 
-    <button onclick="insertAudio()">
-        🔊 Insert Audio
-    </button>
+<button class="toolbtn"
+onclick="insertAudio()">
+🔊 Insert Audio
+</button>
 
-    <button onclick="insertTable()">
-        📊 Insert Table
-    </button>
+<button class="toolbtn"
+onclick="insertTable()">
+📊 Insert Table
+</button>
 
 </div>
+
+<!-- SETTINGS TAB -->
 
 <div id="settings" class="panel">
 
-    <input type="color" id="pageColor">
+<input type="color" id="pageColor">
 
-    <button onclick="changePageColor()">
-        🌈 Page Color
-    </button>
+<button class="toolbtn"
+onclick="changePageColor()">
+🌈 Page Color
+</button>
 
-    <input
-    type="number"
-    id="fontSize"
-    value="18">
+<input
+type="number"
+id="fontSize"
+value="18">
 
-    <button onclick="changeFontSize()">
-        🔤 Font Size
-    </button>
+<button class="toolbtn"
+onclick="changeFontSize()">
+🔤 Font Size
+</button>
 
-    <label>
-        💾 Auto Save
-        <input type="checkbox" id="autoSave">
-    </label>
+<label>
+💾 Auto Save
+<input type="checkbox" id="autoSave">
+</label>
 
 </div>
+
+<!-- EDITOR -->
 
 <div
 id="editor"
@@ -164,12 +219,18 @@ contenteditable="true"
 data-placeholder="Start typing here...">
 </div>
 
+<!-- STATUS BAR -->
+
 <div class="statusbar">
-    Words:
-    <span id="wordCount">0</span>
-    |
-    Characters:
-    <span id="charCount">0</span>
+
+Words:
+<span id="wordCount">0</span>
+
+|
+
+Characters:
+<span id="charCount">0</span>
+
 </div>
 
 <script>
@@ -191,9 +252,12 @@ document.getElementById(tabId)
 
 function newPage(){
 
-if(confirm("Create new document?")){
+if(confirm("Create a new page?")){
+
 editor.innerHTML="";
+
 updateCounts();
+
 }
 
 }
@@ -206,16 +270,16 @@ new Blob(
 {type:"text/html"}
 );
 
-let link =
+let a =
 document.createElement("a");
 
-link.href =
+a.href =
 URL.createObjectURL(blob);
 
-link.download =
-"Document.html";
+a.download =
+"MyDocument.html";
 
-link.click();
+a.click();
 
 }
 
@@ -229,7 +293,8 @@ if(!file) return;
 let reader =
 new FileReader();
 
-reader.onload = function(e){
+reader.onload =
+function(e){
 
 editor.innerHTML =
 e.target.result;
@@ -255,7 +320,7 @@ color
 
 }
 
-function setHighlight(){
+function setHighlightColor(){
 
 let color =
 document.getElementById("highlightColor").value;
@@ -271,7 +336,7 @@ color
 function insertImage(){
 
 let url =
-prompt("Enter Image URL");
+prompt("Enter image URL:");
 
 if(!url) return;
 
@@ -285,7 +350,7 @@ url +
 function insertAudio(){
 
 let url =
-prompt("Enter Audio URL");
+prompt("Enter audio URL:");
 
 if(!url) return;
 
@@ -299,12 +364,12 @@ url +
 function insertTable(){
 
 let rows =
-prompt("Enter rows");
+prompt("Enter rows:");
 
 if(rows === null) return;
 
 let cols =
-prompt("Enter columns");
+prompt("Enter columns:");
 
 if(cols === null) return;
 
@@ -317,14 +382,12 @@ isNaN(cols) ||
 rows < 1 ||
 cols < 1
 ){
-
-alert("Invalid value");
+alert("Enter valid numbers.");
 return;
-
 }
 
 let html =
-'<table border="1" style="border-collapse:collapse;margin:10px 0;">';
+'<table>';
 
 for(let r=0;r<rows;r++){
 
@@ -333,7 +396,7 @@ html += '<tr>';
 for(let c=0;c<cols;c++){
 
 html +=
-'<td contenteditable="true" style="width:80px;height:35px;padding:5px;"></td>';
+'<td contenteditable="true"></td>';
 
 }
 
@@ -392,3 +455,50 @@ document.getElementById("charCount")
 
 editor.addEventListener(
 "input",
+function(){
+
+updateCounts();
+
+if(
+document.getElementById("autoSave").checked
+){
+
+localStorage.setItem(
+"editorData",
+editor.innerHTML
+);
+
+}
+
+}
+);
+
+window.onload=function(){
+
+let saved =
+localStorage.getItem(
+"editorData"
+);
+
+if(saved){
+editor.innerHTML = saved;
+}
+
+let color =
+localStorage.getItem(
+"pageColor"
+);
+
+if(color){
+document.body.style.backgroundColor =
+color;
+}
+
+updateCounts();
+
+};
+
+</script>
+
+</body>
+</html>
