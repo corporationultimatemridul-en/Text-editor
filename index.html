@@ -3,51 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Ultimate Text Editor</title>
 
 <style>
-
 body{
     margin:0;
     font-family:Arial,sans-serif;
-    background:#ffffff;
 }
 
-.toolbar{
-    background:#f0f0f0;
-    padding:10px;
+.tabs{
     display:flex;
-    flex-wrap:wrap;
-    gap:8px;
+    background:#333;
+}
+
+.tab{
+    color:white;
+    padding:12px 20px;
+    cursor:pointer;
+}
+
+.tab:hover{
+    background:#555;
+}
+
+.panel{
+    display:none;
+    padding:10px;
+    background:#f0f0f0;
     border-bottom:1px solid #ccc;
-    position:sticky;
-    top:0;
+}
+
+.active{
+    display:block;
 }
 
 button{
     padding:8px 12px;
+    margin:3px;
     cursor:pointer;
-    border:1px solid #ccc;
-    border-radius:5px;
-}
-
-button:hover{
-    background:#eaeaea;
-}
-
-#settingsPanel{
-    display:none;
-    padding:15px;
-    background:#f9f9f9;
-    border-bottom:1px solid #ccc;
 }
 
 #editor{
-    min-height:700px;
+    min-height:600px;
     padding:20px;
-    font-size:18px;
     outline:none;
+    font-size:18px;
 }
 
 #editor:empty:before{
@@ -55,106 +55,108 @@ button:hover{
     color:gray;
 }
 
-.setting-group{
-    margin-bottom:12px;
+.statusbar{
+    background:#eee;
+    padding:10px;
+    border-top:1px solid #ccc;
 }
-
 </style>
-</head>
 
+</head>
 <body>
 
-<div class="toolbar">
+<div class="tabs">
+    <div class="tab" onclick="showTab('file')">📁 File</div>
+    <div class="tab" onclick="showTab('edit')">✏️ Edit</div>
+    <div class="tab" onclick="showTab('insert')">➕ Insert</div>
+    <div class="tab" onclick="showTab('settings')">⚙️ Settings</div>
+</div>
 
-<button onclick="document.execCommand('bold')">
-<b>B</b>
-</button>
+<div id="file" class="panel active">
 
-<button onclick="document.execCommand('italic')">
-<i>I</i>
-</button>
+    <button onclick="newPage()">📄 New</button>
 
-<button onclick="document.execCommand('underline')">
-<u>U</u>
-</button>
+    <button onclick="document.getElementById('openFile').click()">
+        📂 Open
+    </button>
 
-<input type="color" id="textColor">
-<button onclick="setTextColor()">
-Text Color
-</button>
+    <button onclick="saveFile()">
+        💾 Save
+    </button>
 
-<input type="color" id="highlightColor">
-<button onclick="setHighlightColor()">
-Highlight
-</button>
-
-<button onclick="saveFile()">
-💾 Save
-</button>
-
-<button onclick="document.getElementById('openFile').click()">
-📂 Open
-</button>
-
-<input
-type="file"
-id="openFile"
-style="display:none"
-onchange="openFile(event)"
->
-
-<label>Auto Save</label>
-
-<input
-type="checkbox"
-id="autoSave"
->
-
-<button onclick="toggleSettings()">
-⚙️ Settings
-</button>
+    <input
+    type="file"
+    id="openFile"
+    style="display:none"
+    onchange="openFile(event)">
 
 </div>
 
+<div id="edit" class="panel">
 
-<div id="settingsPanel">
+    <button onclick="document.execCommand('bold')">
+        🅱️ Bold
+    </button>
 
-<h3>Settings</h3>
+    <button onclick="document.execCommand('italic')">
+        𝑰 Italic
+    </button>
 
-<div class="setting-group">
-<label>Website Color</label>
-<input type="color" id="pageColor">
-<button onclick="changePageColor()">
-Apply
-</button>
-</div>
+    <button onclick="document.execCommand('underline')">
+        U̲ Underline
+    </button>
 
-<div class="setting-group">
-<label>Editor Width (%)</label>
-<input type="number" id="editorWidth" value="100">
-<button onclick="changeWidth()">
-Apply
-</button>
-</div>
+    <input type="color" id="textColor">
+    <button onclick="setTextColor()">
+        🎨 Text Color
+    </button>
 
-<div class="setting-group">
-<label>Editor Height (px)</label>
-<input type="number" id="editorHeight" value="700">
-<button onclick="changeHeight()">
-Apply
-</button>
-</div>
-
-<div class="setting-group">
-<label>Font Size (px)</label>
-<input type="number" id="fontSize" value="18">
-<button onclick="changeFontSize()">
-Apply
-</button>
-</div>
+    <input type="color" id="highlightColor">
+    <button onclick="setHighlight()">
+        🖍 Highlight
+    </button>
 
 </div>
 
+<div id="insert" class="panel">
+
+    <button onclick="insertImage()">
+        🖼 Insert Image
+    </button>
+
+    <button onclick="insertAudio()">
+        🔊 Insert Audio
+    </button>
+
+    <button onclick="insertTable()">
+        📊 Insert Table
+    </button>
+
+</div>
+
+<div id="settings" class="panel">
+
+    <input type="color" id="pageColor">
+
+    <button onclick="changePageColor()">
+        🌈 Page Color
+    </button>
+
+    <input
+    type="number"
+    id="fontSize"
+    value="18">
+
+    <button onclick="changeFontSize()">
+        🔤 Font Size
+    </button>
+
+    <label>
+        💾 Auto Save
+        <input type="checkbox" id="autoSave">
+    </label>
+
+</div>
 
 <div
 id="editor"
@@ -162,45 +164,87 @@ contenteditable="true"
 data-placeholder="Start typing here...">
 </div>
 
+<div class="statusbar">
+    Words:
+    <span id="wordCount">0</span>
+    |
+    Characters:
+    <span id="charCount">0</span>
+</div>
+
 <script>
 
 const editor =
 document.getElementById("editor");
 
-const autoSave =
-document.getElementById("autoSave");
+function showTab(tabId){
 
+document.querySelectorAll(".panel")
+.forEach(panel=>{
+panel.classList.remove("active");
+});
 
-window.onload=function(){
+document.getElementById(tabId)
+.classList.add("active");
 
-let savedText =
-localStorage.getItem("editorText");
-
-let savedColor =
-localStorage.getItem("pageColor");
-
-let savedAuto =
-localStorage.getItem("autoSave");
-
-if(savedText){
-editor.innerHTML=savedText;
 }
 
-if(savedColor){
-document.body.style.backgroundColor=
-savedColor;
+function newPage(){
+
+if(confirm("Create new document?")){
+editor.innerHTML="";
+updateCounts();
 }
 
-if(savedAuto==="true"){
-autoSave.checked=true;
 }
+
+function saveFile(){
+
+let blob =
+new Blob(
+[editor.innerHTML],
+{type:"text/html"}
+);
+
+let link =
+document.createElement("a");
+
+link.href =
+URL.createObjectURL(blob);
+
+link.download =
+"Document.html";
+
+link.click();
+
+}
+
+function openFile(event){
+
+let file =
+event.target.files[0];
+
+if(!file) return;
+
+let reader =
+new FileReader();
+
+reader.onload = function(e){
+
+editor.innerHTML =
+e.target.result;
+
+updateCounts();
 
 };
 
+reader.readAsText(file);
+
+}
 
 function setTextColor(){
 
-let color=
+let color =
 document.getElementById("textColor").value;
 
 document.execCommand(
@@ -211,10 +255,9 @@ color
 
 }
 
+function setHighlight(){
 
-function setHighlightColor(){
-
-let color=
+let color =
 document.getElementById("highlightColor").value;
 
 document.execCommand(
@@ -225,103 +268,91 @@ color
 
 }
 
+function insertImage(){
 
-function saveFile(){
+let url =
+prompt("Enter Image URL");
 
-let blob=
-new Blob(
-[editor.innerHTML],
-{type:"text/html"}
-);
+if(!url) return;
 
-let link=
-document.createElement("a");
-
-link.href=
-URL.createObjectURL(blob);
-
-link.download=
-"MyNotes.html";
-
-link.click();
+editor.innerHTML +=
+'<br><img src="' +
+url +
+'" style="max-width:400px;"><br>';
 
 }
 
+function insertAudio(){
 
-function openFile(event){
+let url =
+prompt("Enter Audio URL");
 
-let file=
-event.target.files[0];
+if(!url) return;
 
-if(!file) return;
-
-let reader=
-new FileReader();
-
-reader.onload=function(e){
-
-editor.innerHTML=
-e.target.result;
-
-};
-
-reader.readAsText(file);
+editor.innerHTML +=
+'<br><audio controls src="' +
+url +
+'"></audio><br>';
 
 }
 
+function insertTable(){
 
-autoSave.addEventListener(
-"change",
-function(){
+let rows =
+prompt("Enter rows");
 
-localStorage.setItem(
-"autoSave",
-this.checked
-);
+if(rows === null) return;
 
-}
-);
+let cols =
+prompt("Enter columns");
 
+if(cols === null) return;
 
-editor.addEventListener(
-"input",
-function(){
+rows = parseInt(rows);
+cols = parseInt(cols);
 
-if(autoSave.checked){
+if(
+isNaN(rows) ||
+isNaN(cols) ||
+rows < 1 ||
+cols < 1
+){
 
-localStorage.setItem(
-"editorText",
-editor.innerHTML
-);
-
-}
-
-}
-);
-
-
-function toggleSettings(){
-
-let panel=
-document.getElementById(
-"settingsPanel"
-);
-
-if(panel.style.display==="block"){
-panel.style.display="none";
-}else{
-panel.style.display="block";
-}
+alert("Invalid value");
+return;
 
 }
 
+let html =
+'<table border="1" style="border-collapse:collapse;margin:10px 0;">';
+
+for(let r=0;r<rows;r++){
+
+html += '<tr>';
+
+for(let c=0;c<cols;c++){
+
+html +=
+'<td contenteditable="true" style="width:80px;height:35px;padding:5px;"></td>';
+
+}
+
+html += '</tr>';
+
+}
+
+html += '</table><br>';
+
+editor.innerHTML += html;
+
+}
 
 function changePageColor(){
 
-let color=
+let color =
 document.getElementById("pageColor").value;
 
-document.body.style.backgroundColor=
+document.body.style.backgroundColor =
 color;
 
 localStorage.setItem(
@@ -331,40 +362,33 @@ color
 
 }
 
-
-function changeWidth(){
-
-let width=
-document.getElementById("editorWidth").value;
-
-editor.style.width=
-width+"%";
-
-}
-
-
-function changeHeight(){
-
-let height=
-document.getElementById("editorHeight").value;
-
-editor.style.minHeight=
-height+"px";
-
-}
-
-
 function changeFontSize(){
 
-let size=
+let size =
 document.getElementById("fontSize").value;
 
-editor.style.fontSize=
-size+"px";
+editor.style.fontSize =
+size + "px";
 
 }
 
-</script>
+function updateCounts(){
 
-</body>
-</html>
+let text =
+editor.innerText;
+
+let words =
+text.trim()
+? text.trim().split(/\s+/).length
+: 0;
+
+document.getElementById("wordCount")
+.textContent = words;
+
+document.getElementById("charCount")
+.textContent = text.length;
+
+}
+
+editor.addEventListener(
+"input",
