@@ -3,60 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Ultimate Text Editor</title>
+<title>Text Editor</title>
 
 <style>
 
 body{
     margin:0;
     font-family:Arial,sans-serif;
-    background:#ffffff;
 }
 
-.toolbar{
-    background:#f0f0f0;
+.tabs{
+    background:#333;
     padding:10px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    border-bottom:1px solid #ccc;
-    position:sticky;
-    top:0;
 }
 
-button{
-    padding:8px 12px;
+.tabs button{
+    background:#444;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    margin-right:5px;
     cursor:pointer;
-    border:1px solid #ccc;
-    border-radius:5px;
 }
 
-button:hover{
-    background:#eaeaea;
-}
-
-#settingsPanel{
+.panel{
     display:none;
-    padding:15px;
-    background:#f9f9f9;
-    border-bottom:1px solid #ccc;
+    padding:10px;
+    background:#eeeeee;
+}
+
+#file{
+    display:block;
+}
+
+.toolbtn{
+    padding:8px 12px;
+    margin:3px;
 }
 
 #editor{
-    min-height:700px;
+    min-height:600px;
     padding:20px;
+    width:100%;
+    box-sizing:border-box;
     font-size:18px;
     outline:none;
 }
 
 #editor:empty:before{
-    content:attr(data-placeholder);
+    content:"Start typing here...";
     color:gray;
-}
-
-.setting-group{
-    margin-bottom:12px;
 }
 
 </style>
@@ -64,203 +60,191 @@ button:hover{
 
 <body>
 
-<div class="toolbar">
+<div class="tabs">
 
-<button onclick="document.execCommand('bold')">
-<b>B</b>
+<button onclick="showTab('file')">📁 File</button>
+
+<button onclick="showTab('edit')">✏️ Edit</button>
+
+<button onclick="showTab('insert')">➕ Insert</button>
+
+<button onclick="showTab('settings')">⚙️ Settings</button>
+
+</div>
+
+<div id="file" class="panel">
+
+<button class="toolbtn" onclick="newPage()">
+📄 New Page
 </button>
 
-<button onclick="document.execCommand('italic')">
-<i>I</i>
-</button>
-
-<button onclick="document.execCommand('underline')">
-<u>U</u>
-</button>
-
-<input type="color" id="textColor">
-<button onclick="setTextColor()">
-Text Color
-</button>
-
-<input type="color" id="highlightColor">
-<button onclick="setHighlightColor()">
-Highlight
-</button>
-
-<button onclick="saveFile()">
-💾 Save
-</button>
-
-<button onclick="document.getElementById('openFile').click()">
+<button class="toolbtn"
+onclick="document.getElementById('openFile').click()">
 📂 Open
+</button>
+
+<button class="toolbtn" onclick="saveFile()">
+💾 Save
 </button>
 
 <input
 type="file"
 id="openFile"
 style="display:none"
-onchange="openFile(event)"
->
+onchange="openFile(event)">
 
-<label>Auto Save</label>
+</div>
+
+<div id="edit" class="panel">
+
+<button class="toolbtn"
+onclick="document.execCommand('bold')">
+🅱️ Bold
+</button>
+
+<button class="toolbtn"
+onclick="document.execCommand('italic')">
+𝑰 Italic
+</button>
+
+<button class="toolbtn"
+onclick="document.execCommand('underline')">
+U̲ Underline
+</button>
+
+</div>
+
+<div id="insert" class="panel">
+
+<button class="toolbtn"
+onclick="insertImage()">
+🖼 Image
+</button>
+
+<button class="toolbtn"
+onclick="insertAudio()">
+🔊 Audio
+</button>
+
+<button class="toolbtn"
+onclick="insertTable()">
+📊 Table
+</button>
+
+</div>
+
+<div id="settings" class="panel">
+
+<input type="color" id="pageColor">
+
+<button class="toolbtn"
+onclick="changePageColor()">
+🌈 Page Color
+</button>
+
+<br><br>
+
+<label>📏 Page Width (%)</label>
 
 <input
-type="checkbox"
-id="autoSave"
->
+type="number"
+id="pageWidth"
+value="100"
+min="20"
+max="100">
 
-<button onclick="toggleSettings()">
-⚙️ Settings
+<button class="toolbtn"
+onclick="changeWidth()">
+Apply Width
+</button>
+
+<br><br>
+
+<label>🔤 Font Size</label>
+
+<input
+type="number"
+id="fontSize"
+value="18"
+min="10"
+max="72">
+
+<button class="toolbtn"
+onclick="changeFontSize()">
+Apply Font Size
 </button>
 
 </div>
 
-
-<div id="settingsPanel">
-
-<h3>Settings</h3>
-
-<div class="setting-group">
-<label>Website Color</label>
-<input type="color" id="pageColor">
-<button onclick="changePageColor()">
-Apply
-</button>
-</div>
-
-<div class="setting-group">
-<label>Editor Width (%)</label>
-<input type="number" id="editorWidth" value="100">
-<button onclick="changeWidth()">
-Apply
-</button>
-</div>
-
-<div class="setting-group">
-<label>Editor Height (px)</label>
-<input type="number" id="editorHeight" value="700">
-<button onclick="changeHeight()">
-Apply
-</button>
-</div>
-
-<div class="setting-group">
-<label>Font Size (px)</label>
-<input type="number" id="fontSize" value="18">
-<button onclick="changeFontSize()">
-Apply
-</button>
-</div>
-
-</div>
-
-
-<div
-id="editor"
-contenteditable="true"
-data-placeholder="Start typing here...">
+<div id="editor"
+contenteditable="true">
 </div>
 
 <script>
 
-const editor =
-document.getElementById("editor");
+function showTab(tabId){
 
-const autoSave =
-document.getElementById("autoSave");
+let panels =
+document.getElementsByClassName("panel");
 
+for(let i=0;i<panels.length;i++){
 
-window.onload=function(){
-
-let savedText =
-localStorage.getItem("editorText");
-
-let savedColor =
-localStorage.getItem("pageColor");
-
-let savedAuto =
-localStorage.getItem("autoSave");
-
-if(savedText){
-editor.innerHTML=savedText;
-}
-
-if(savedColor){
-document.body.style.backgroundColor=
-savedColor;
-}
-
-if(savedAuto==="true"){
-autoSave.checked=true;
-}
-
-};
-
-
-function setTextColor(){
-
-let color=
-document.getElementById("textColor").value;
-
-document.execCommand(
-"foreColor",
-false,
-color
-);
+panels[i].style.display="none";
 
 }
 
-
-function setHighlightColor(){
-
-let color=
-document.getElementById("highlightColor").value;
-
-document.execCommand(
-"hiliteColor",
-false,
-color
-);
+document.getElementById(tabId)
+.style.display="block";
 
 }
 
+function newPage(){
+
+document.getElementById("editor")
+.innerHTML="";
+
+}
 
 function saveFile(){
 
-let blob=
+let text =
+document.getElementById("editor")
+.innerHTML;
+
+let blob =
 new Blob(
-[editor.innerHTML],
+[text],
 {type:"text/html"}
 );
 
-let link=
+let a =
 document.createElement("a");
 
-link.href=
+a.href =
 URL.createObjectURL(blob);
 
-link.download=
-"MyNotes.html";
+a.download =
+"Document.html";
 
-link.click();
+a.click();
 
 }
 
-
 function openFile(event){
 
-let file=
+let file =
 event.target.files[0];
 
 if(!file) return;
 
-let reader=
+let reader =
 new FileReader();
 
-reader.onload=function(e){
+reader.onload =
+function(e){
 
-editor.innerHTML=
+document.getElementById("editor")
+.innerHTML =
 e.target.result;
 
 };
@@ -269,98 +253,100 @@ reader.readAsText(file);
 
 }
 
+function insertImage(){
 
-autoSave.addEventListener(
-"change",
-function(){
+let url =
+prompt("Enter image URL:");
 
-localStorage.setItem(
-"autoSave",
-this.checked
-);
+if(url){
 
-}
-);
-
-
-editor.addEventListener(
-"input",
-function(){
-
-if(autoSave.checked){
-
-localStorage.setItem(
-"editorText",
-editor.innerHTML
-);
+document.getElementById("editor")
+.innerHTML +=
+'<br><img src="'+url+'" width="300"><br>';
 
 }
 
 }
-);
 
+function insertAudio(){
 
-function toggleSettings(){
+let url =
+prompt("Enter audio URL:");
 
-let panel=
-document.getElementById(
-"settingsPanel"
-);
+if(url){
 
-if(panel.style.display==="block"){
-panel.style.display="none";
-}else{
-panel.style.display="block";
-}
+document.getElementById("editor")
+.innerHTML +=
+'<br><audio controls src="'+url+'"></audio><br>';
 
 }
 
+}
+
+function insertTable(){
+
+let rows =
+prompt("Rows:");
+
+let cols =
+prompt("Columns:");
+
+rows = parseInt(rows);
+cols = parseInt(cols);
+
+if(isNaN(rows)||isNaN(cols)) return;
+
+let table =
+"<table border='1' style='border-collapse:collapse'>";
+
+for(let r=0;r<rows;r++){
+
+table += "<tr>";
+
+for(let c=0;c<cols;c++){
+
+table +=
+"<td contenteditable='true' style='width:80px;height:30px'></td>";
+
+}
+
+table += "</tr>";
+
+}
+
+table += "</table><br>";
+
+document.getElementById("editor")
+.innerHTML += table;
+
+}
 
 function changePageColor(){
 
-let color=
+document.body.style.backgroundColor =
 document.getElementById("pageColor").value;
 
-document.body.style.backgroundColor=
-color;
-
-localStorage.setItem(
-"pageColor",
-color
-);
-
 }
-
 
 function changeWidth(){
 
-let width=
-document.getElementById("editorWidth").value;
+let width =
+document.getElementById("pageWidth").value;
 
-editor.style.width=
-width+"%";
-
-}
-
-
-function changeHeight(){
-
-let height=
-document.getElementById("editorHeight").value;
-
-editor.style.minHeight=
-height+"px";
+document.getElementById("editor")
+.style.width =
+width + "%";
 
 }
-
 
 function changeFontSize(){
 
-let size=
+let size =
 document.getElementById("fontSize").value;
 
-editor.style.fontSize=
-size+"px";
+document.getElementById("editor")
+.style.fontSize =
+size + "px";
 
 }
 
